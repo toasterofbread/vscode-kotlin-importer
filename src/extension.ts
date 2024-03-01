@@ -100,16 +100,18 @@ async function addImportToFile(file: vscode.TextDocument, import_line: string): 
 
 		if (similarity >= closest_import_similarity) {
 			closest_import_index = i
+			closest_import_similarity = similarity
 		}
 	}
 
 	const insertion_index: number = closest_import_index === -1 ? package_index : closest_import_index
+	const prefix: string = closest_import_index === -1 ? "\n" : ""
 
 	const editor: vscode.TextEditor = await vscode.window.showTextDocument(file)
 	editor.edit((builder) => {
 		builder.insert(
 			new vscode.Position(insertion_index + 1, 0),
-			import_line + "\n"
+			prefix + import_line + "\n"
 		)
 	})
 
