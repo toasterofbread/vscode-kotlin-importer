@@ -17,11 +17,17 @@ export function activate(context: vscode.ExtensionContext) {
 			keyword = current_document.getText(editor.selection)
 		}
 		else {
-			keyword = (await vscode.window.showInputBox())?.trim()
+			const word: vscode.Range | undefined = current_document.getWordRangeAtPosition(editor.selection.active)
+			if (word !== undefined) {
+				keyword = current_document.getText(word)
+			}
 		}
 
 		if (keyword === undefined || keyword === "") {
-			return
+			keyword = (await vscode.window.showInputBox())?.trim()
+			if (keyword === undefined || keyword === "") {
+				return
+			}
 		}
 
 		const index: ImportIndex | undefined = await getIndex(context)
