@@ -3,7 +3,7 @@
   "displayName": "vscode-kotlin-importer",
   "description": "Searches project source code for matching imports",
   "repository": "https://github.com/toasterofbread/vscode-kotlin-importer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "engines": {
     "vscode": "^1.86.0"
   },
@@ -21,6 +21,18 @@
       {
         "command": "vscode-kotlin-importer.import-terminal",
         "title": "Import all missing Kotlin keywords in terminal output"
+      },
+      {
+        "command": "vscode-kotlin-importer.optimise-imports",
+        "title": "Optimise Kotlin imports in file"
+      },
+      {
+        "command": "vscode-kotlin-importer.sort-imports",
+        "title": "Sort Kotlin imports in file"
+      },
+      {
+        "command": "vscode-kotlin-importer.clear-imports",
+        "title": "Clear all Kotlin imports in file"
       },
       {
         "command": "vscode-kotlin-importer.rebuild-index",

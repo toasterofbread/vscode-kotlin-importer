@@ -1,16 +1,25 @@
 import * as vscode from 'vscode'
 import * as importindex from './importIndex'
 
+export async function delay(ms: number) {
+	return new Promise( resolve => setTimeout(resolve, ms) );
+}
+
 // Returns true if import added, false if alreday present in file
-export async function addImportToFile(file: vscode.TextDocument, import_line: string): Promise<boolean> {
+export async function addImportToFile(
+	file: vscode.TextDocument,
+	import_line: string,
+	check_if_already_present: boolean = true
+): Promise<boolean> {
 	const keyword: string = getImportStringKeyword(import_line)!
 
-	// Check if import is already present in file
-	const index: importindex.Index = {}
-	indexFileImports(file, index, keyword)
-	const keyword_imports: string[] | undefined = index[keyword]
-	if (keyword_imports?.includes(import_line)) {
-		return false
+	if (check_if_already_present) {
+		const index: importindex.Index = {}
+		indexFileImports(file, index, keyword)
+		const keyword_imports: string[] | undefined = index[keyword]
+		if (keyword_imports?.includes(import_line)) {
+			return false
+		}
 	}
 
 	const import_parts: string[] = import_line.trim().substring(7).split(".")
@@ -50,7 +59,7 @@ export async function addImportToFile(file: vscode.TextDocument, import_line: st
 	const prefix: string = closest_import_index === -1 ? "\n" : ""
 
 	const editor: vscode.TextEditor = await vscode.window.showTextDocument(file)
-	editor.edit((builder) => {
+	await editor.edit((builder) => {
 		builder.insert(
 			new vscode.Position(insertion_index + 1, 0),
 			prefix + import_line + "\n"
@@ -58,6 +67,27 @@ export async function addImportToFile(file: vscode.TextDocument, import_line: st
 	})
 
 	return true
+}
+
+export async function clearFileImports(file: vscode.TextDocument) {
+	const editor: vscode.TextEditor = await vscode.window.showTextDocument(file)
+	await editor.edit((builder) => {
+		let last_import: number = -1
+		for (let i = 0; i < file.lineCount; i++) {
+			const line: vscode.TextLine = file.lineAt(i)
+			if (line.text.trimStart().startsWith("import ")) {
+				builder.delete(line.rangeIncludingLineBreak)
+				last_import = i
+			}
+		}
+
+		if (last_import + 1 < file.lineCount) {
+			const line: vscode.TextLine = file.lineAt(last_import + 1)
+			if (line.isEmptyOrWhitespace) {
+				builder.delete(line.rangeIncludingLineBreak)
+			}
+		}
+	})
 }
 
 export async function indexFileImports(file: vscode.TextDocument, imports: importindex.Index, keyword: string | null = null) {
