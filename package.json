@@ -37,6 +37,10 @@
       {
         "command": "vscode-kotlin-importer.rebuild-index",
         "title": "Rebuild Kotlin import index"
+      },
+      {
+        "command": "vscode-kotlin-importer.index-file-imports",
+        "title": "Index Kotlin imports in the current file"
       }
     ],
     "menus": {

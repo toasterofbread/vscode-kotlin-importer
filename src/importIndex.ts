@@ -14,10 +14,14 @@ export async function getIndex(context: vscode.ExtensionContext, rebuild: boolea
 	if (index === undefined) {
 		index = await buildIndex()
 		if (index !== undefined) {
-			context.workspaceState.update("import-index", index)
+			updateIndex(context, index)
 		}
 	}
 	return index
+}
+
+async function updateIndex(context: vscode.ExtensionContext, index: Index) {
+	context.workspaceState.update("import-index", index)
 }
 
 async function buildIndex(): Promise<Index | undefined> {
@@ -47,6 +51,34 @@ async function buildIndex(): Promise<Index | undefined> {
 
 		return index
 	})
+}
+
+export async function addImportsToStoredIndex(context: vscode.ExtensionContext, index: Index): Promise<number> {
+	let existing_index: Index | undefined = await getIndex(context, false)
+	let added: number = 0
+
+	if (existing_index !== undefined) {
+		for (const [keyword, imports] of Object.entries(index)) {
+			let all_imports: string[] = existing_index.hasOwnProperty(keyword) ? existing_index[keyword] : []
+
+			for (const import_line of imports) {
+				if (all_imports.includes(import_line)) {
+					continue
+				}
+				added++
+				all_imports.push(import_line)
+			}
+
+			existing_index[keyword] = all_imports
+		}
+	}
+	else {
+		existing_index = index
+	}
+
+	context.workspaceState.update("import-index", existing_index)
+
+	return added
 }
 
 async function findKotlinKeywordImports(
