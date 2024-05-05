@@ -3,7 +3,7 @@
   "displayName": "vscode-kotlin-importer",
   "description": "Searches project source code for matching imports",
   "repository": "https://github.com/toasterofbread/vscode-kotlin-importer",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "engines": {
     "vscode": "^1.86.0"
   },
