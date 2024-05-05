@@ -2,7 +2,8 @@ import * as vscode from 'vscode'
 import * as importindex from './importIndex'
 
 const IMPORT_ERROR_PREFIX: string = "e: file://"
-const IMPORT_ERROR_KEYWORD_PREFIX: string = "Unresolved reference: "
+const IMPORT_ERROR_KEYWORD_PREFIX: string = "Unresolved reference"
+const IMPORT_ERROR_KEYWORD_PREFIX_GAP: number = 2
 
 // Returns a record of file paths to missing imports
 export async function readTerminalImports(): Promise<Record<string, importindex.ImportInfo[]> | null> {
@@ -50,8 +51,13 @@ function parseGradleOutputMissingImports(output: string): Record<string, importi
         const location_in_file: string = import_file.substring(second_last_colon + 1)
         import_file = import_file.substring(0, second_last_colon)
 
+        let keyword_end_index: number = line.indexOf("'", unres_ref_index + IMPORT_ERROR_KEYWORD_PREFIX.length + IMPORT_ERROR_KEYWORD_PREFIX_GAP)
+        if (keyword_end_index === -1) {
+            keyword_end_index = line.length
+        }
+
         const import_info: importindex.ImportInfo = {
-            keyword: line.substring(unres_ref_index + IMPORT_ERROR_KEYWORD_PREFIX.length).trim(),
+            keyword: line.substring(unres_ref_index + IMPORT_ERROR_KEYWORD_PREFIX.length + IMPORT_ERROR_KEYWORD_PREFIX_GAP, keyword_end_index).trim(),
             file_path: import_file,
             location_in_file: location_in_file
         }
