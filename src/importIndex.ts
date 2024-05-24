@@ -86,7 +86,7 @@ async function findKotlinKeywordImports(
 	onProgress: (current: number, total: number) => any = () => {},
 	isCancelled: () => boolean = () => { return false }
 ): Promise<Index> {
-	const files: vscode.Uri[] = await vscode.workspace.findFiles("**/*.kt")
+	const files: vscode.Uri[] = await vscode.workspace.findFiles("**/*.{kt,kt.*}")
 	const imports: Index = {}
 
 	for (const [index, uri] of files.entries()) {
